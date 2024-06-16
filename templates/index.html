@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Events</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .event { margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Latest GitHub Events</h1>
+    <div id="events"></div>
+    <script>
+        async function fetchEvents() {
+            const response = await fetch('/events');
+            const events = await response.json();
+            const eventsDiv = document.getElementById('events');
+            eventsDiv.innerHTML = '';
+            events.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event';
+                let eventText = '';
+                if (event.type === 'push') {
+                    eventText = `${event.author} pushed to ${event.to_branch} on ${new Date(event.timestamp).toUTCString()}`;
+                } else if (event.type === 'pull_request') {
+                    eventText = `${event.author} submitted a pull request from ${event.from_branch} to ${event.to_branch} on ${new Date(event.timestamp).toUTCString()}`;
+                } else if (event.type === 'merge') {
+                    eventText = `${event.author} merged branch ${event.from_branch} to ${event.to_branch} on ${new Date(event.timestamp).toUTCString()}`;
+                }
+                eventDiv.innerText = eventText;
+                eventsDiv.appendChild(eventDiv);
+            });
+        }
+
+        setInterval(fetchEvents, 15000);
+        fetchEvents();
+    </script>
+</body>
+</html>
